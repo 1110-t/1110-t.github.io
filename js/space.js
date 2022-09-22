@@ -56,8 +56,10 @@ class Scene{
   scene;
   camera;
   cameraLotation = "";
+  cameraLotationY = "";
   cameraStop = 0;
   startMouse = 0;
+  startMouseY = 0;
   constructor(world){
     this.world = document.querySelector("#"+world);
   };
@@ -76,6 +78,23 @@ class Scene{
     this.camera = new THREE.PerspectiveCamera(45, document.documentElement.clientWidth / document.documentElement.clientHeight,1,10000);
     this.camera.position.set(0, 0, +5000);
     this.camera.lookAt(new THREE.Vector3(0, 0, 0));
+  };
+  makeStars(){
+    const vertices = [];
+    for (var i = 0; i < 10000; i++) {
+      let temp = 10000 * (Math.random()-0.5);
+      vertices.push(temp);
+    };
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices,3));
+    // マテリアルを作成
+    const material = new THREE.PointsMaterial({
+      size: 10,
+      color: 0xffffff,
+    });
+    // 物体を作成
+    const mesh = new THREE.Points(geometry, material);
+    this.scene.add(mesh);
   };
   display(){
     // 星の移動
@@ -99,6 +118,14 @@ class Scene{
       // 右回転 現在のカメラの向いている方向に -0.1
       camera.rotation.y = camera.rotation.y - 0.015;
     };
+    // 向き
+    if(scene.cameraLotationY == "u"){
+      // 上回転 現在のカメラの向いている方向に +0.1
+      camera.rotation.x = camera.rotation.x + 0.015;
+    } else if(scene.cameraLotationY == "d"){
+      // 下回転 現在のカメラの向いている方向に -0.1
+      camera.rotation.x = camera.rotation.x - 0.015;
+    };
     let cameraDirection = camera.getWorldDirection( vector );
     // 移動
     camera.position.x = camera.position.x + cameraDirection.x*1;
@@ -113,15 +140,18 @@ let scene = new Scene('space');
 scene.render();
 scene.cameras();
 scene.display();
+scene.makeStars();
 
 // イベントリスナーズ
 scene.world.addEventListener("mousedown",function(e){
   scene.cameraStop = 1;
   scene.startMouse = e.offsetX;
+  scene.startMouseY = e.offsetY;
 });
 scene.world.addEventListener("mouseup",function(e){
   scene.cameraStop = 0;
   scene.cameraLotation = "";
+  scene.cameraLotationY = "";
 });
 scene.world.addEventListener("mousemove",function(e){
   if(scene.cameraStop){
@@ -130,6 +160,11 @@ scene.world.addEventListener("mousemove",function(e){
     } else {
       scene.cameraLotation = "l";
     };
+    // if(e.offsetY > scene.startMouseY){
+    //   scene.cameraLotationY = "d";
+    // } else {
+    //   scene.cameraLotationY = "u";
+    // };
   };
 });
 
