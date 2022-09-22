@@ -66,14 +66,14 @@ class Scene{
       canvas: this.world
     });
     this.renderer.setPixelRatio(window.devicePixelRatio);
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setSize(document.documentElement.clientWidth, document.documentElement.clientHeight);
     this.scene = new THREE.Scene();
     const directionalLight = new THREE.PointLight(0xFFFFFF,1,0,0);
     directionalLight.position.set(0, 0, 0);
     this.scene.add(directionalLight);
   };
   cameras(){
-    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight,1,10000);
+    this.camera = new THREE.PerspectiveCamera(45, document.documentElement.clientWidth / document.documentElement.clientHeight,1,10000);
     this.camera.position.set(0, 0, +5000);
     this.camera.lookAt(new THREE.Vector3(0, 0, 0));
   };
