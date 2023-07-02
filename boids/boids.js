@@ -2,11 +2,15 @@ let ctx = "";
 
 let makeBoids = function(ctx,x,y){
     ctx.beginPath () ;
-    ctx.arc(x, y, 1, 0 , Math.PI*2, false ) ;
+    ctx.arc(x, y, 2, 0 , Math.PI*2, false ) ;
     ctx.stroke() ;
 };
 
 let canvas = document.getElementById('canvas');
+let w = window.innerWidth;
+let h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
 let boids = [];
 let average = {vx:0,vy:0};
 
@@ -14,8 +18,8 @@ if (canvas.getContext) {
     // boidsを作成する
     for (let index = 0; index < 100; index++) {
       let boid = {};
-      let x = Math.floor( Math.random() * 500 );
-      let y = Math.floor( Math.random() * 500 );
+      let x = Math.floor( Math.random() * w );
+      let y = Math.floor( Math.random() * h );
       boid.x = x;
       boid.y = y;
       boid.vx = 0;
@@ -48,8 +52,18 @@ let cohesion = function(index) {
     boids[index].vy += ((center.y - boids[index].y)/100);
 }
 
-let direction = function(dir,v){
-    if(dir > 500 && v > 0){
+let direction_x = function(dir,v){
+    if(dir > w && v > 0){
+      return -1;
+    } else if(dir < 0 && v < 0){
+      return -1;
+    } else {
+      return 1;
+    };
+};
+
+let direction_y = function(dir,v){
+    if(dir > h && v > 0){
       return -1;
     } else if(dir < 0 && v < 0){
       return -1;
@@ -66,7 +80,7 @@ let separation = function(index) {
       }
       //鳥同士の距離を測る
       let distance = getDistance( boids[i], boids[index] );
-  
+
       //鳥同士が10px以内に位置する場合はベクトルを調整する
       if( distance < 20 ) {
         boids[index].vx -= ((boids[i].x - boids[index].x)*0.1);
@@ -78,7 +92,7 @@ let separation = function(index) {
 let alignment = function(index) {
     let average = {vx: 0, vy: 0};
     let boidLength = boids.length;
-  
+
     //全体の平均ベクトルを算出する
     for( let i = 0; i < boidLength; i++ ) {
       if( i === index ) {
@@ -89,7 +103,7 @@ let alignment = function(index) {
     }
     average.vx /= boidLength - 1;
     average.vy /= boidLength - 1;
-  
+
     //平均ベクトルに近づくように自分のベクトルを調整する
     boids[index].vx += ((average.vx - boids[index].vx)/2*0.2);
     boids[index].vy += ((average.vy - boids[index].vy)/2*0.2);
@@ -102,13 +116,13 @@ let getDistance = function(a,b){
 
 let main = function() {
     speed = 4;
-    ctx.clearRect(0, 0, 500, 500);
+    ctx.clearRect(0, 0, w, h);
     for (let index = 0; index < boids.length; index++) {
         alignment(index);
         cohesion(index);
         separation(index);
-        dir_x = direction(boids[index].x + boids[index].vx,boids[index].vx);
-        dir_y = direction(boids[index].y + boids[index].vy,boids[index].vy);
+        dir_x = direction_x(boids[index].x + boids[index].vx,boids[index].vx);
+        dir_y = direction_y(boids[index].y + boids[index].vy,boids[index].vy);
         let movement = Math.sqrt(boids[index].vx**2 + boids[index].vy**2);
         while(movement > speed){
           boids[index].vx = (boids[index].vx / movement) * 4;
