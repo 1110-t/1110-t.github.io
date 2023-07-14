@@ -1,6 +1,11 @@
 const canvas = document.querySelector("canvas");
 const context = canvas.getContext("2d");
 
+let w = window.innerWidth;
+let h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+
 const ALIVE = 1;
 const DEAD = 0;
 
